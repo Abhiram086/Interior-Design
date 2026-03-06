@@ -26,24 +26,13 @@
       <h2>Interior Design</h2>
 
       <div class="button-group">
-        <h3>Select Category</h3>
-        <button class="category-btn" data-type="sofa">Sofas</button>
-        <button class="category-btn" data-type="chair">Chairs</button>
-        <button class="category-btn" data-type="table">Tables</button>
-        <button class="category-btn" data-type="bed">Beds</button>
-        <button class="category-btn" data-type="lamp">Lamps</button>
-        <button class="category-btn" data-type="wardrobe">Wardrobes</button>
-      </div>
-
-      <div id="model-selection-panel" class="button-group"
-        style="display: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px;">
-        <h3 id="category-title">Select Model</h3>
-        <input type="file" id="model-upload" accept=".glb" multiple style="display: none;">
-        <button id="btn-upload-model">Upload .glb files</button>
-        <div id="model-list"
-          style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px; max-height: 150px; overflow-y: auto;">
-          <!-- Model buttons injected here via JS -->
-        </div>
+        <h3>Add Furniture</h3>
+        <button class="add-btn" data-type="sofa">Add Sofa</button>
+        <button class="add-btn" data-type="chair">Add Chair</button>
+        <button class="add-btn" data-type="table">Add Table</button>
+        <button class="add-btn" data-type="bed">Add Bed</button>
+        <button class="add-btn" data-type="lamp">Add Lamp</button>
+        <button class="add-btn" data-type="wardrobe">Add Wardrobe</button>
       </div>
 
       <div class="button-group align-bottom"
@@ -63,13 +52,13 @@
 
     <!-- Asset Management System -->
     <a-assets timeout="10000">
-      <!-- Models (Lazy loading simulation: paths are specified but will fail silently if missing) -->
-      <a-asset-item id="sofa-model" src="assets/models/sofa.glb"></a-asset-item>
-      <a-asset-item id="bed-model" src="assets/models/bed.glb"></a-asset-item>
-      <a-asset-item id="chair-model" src="assets/models/chair.glb"></a-asset-item>
-      <a-asset-item id="table-model" src="assets/models/dining_table.glb"></a-asset-item>
-      <a-asset-item id="lamp-model" src="assets/models/lamp.glb"></a-asset-item>
-      <a-asset-item id="wardrobe-model" src="assets/models/wardrobe.glb"></a-asset-item>
+      <!-- Models -->
+      <a-asset-item id="sofaModel" src="assets/models/sofa.glb"></a-asset-item>
+      <a-asset-item id="bedModel" src="assets/models/bed.glb"></a-asset-item>
+      <a-asset-item id="chairModel" src="assets/models/chair.glb"></a-asset-item>
+      <a-asset-item id="tableModel" src="assets/models/table.glb"></a-asset-item>
+      <a-asset-item id="lampModel" src="assets/models/lamp.glb"></a-asset-item>
+      <a-asset-item id="wardrobeModel" src="assets/models/wardrobe.glb"></a-asset-item>
 
       <!-- Textures -->
       <img id="wood-floor" src="assets/textures/wood_floor.jpg">
@@ -78,38 +67,38 @@
       <img id="ceiling-texture" src="assets/textures/ceiling.jpg">
 
       <!-- Environment -->
-      <img id="sky-env" src="assets/environment/apartment_hdr.jpg">
+      <img id="roomEnv" src="assets/environment/modern-empty-room.jpg">
     </a-assets>
 
     <!-- Environment Setup -->
     <!-- Fallback colored sky if image is missing -->
-    <a-sky color="#87CEEB"></a-sky>
+    <a-sky color="#87CEEB" src="#roomEnv"></a-sky>
 
     <!-- Lighting -->
     <a-light type="ambient" intensity="0.6"></a-light>
     <a-light type="directional" position="2 4 2"></a-light>
     <a-light type="point" intensity="0.5" position="0 3 0"></a-light>
 
-    <!-- Room Setup (10m x 10m) -->
+    <!-- Room Setup (12m x 12m) -->
     <a-entity id="room">
       <!-- Floor -->
-      <a-plane id="floor" width="10" height="10" rotation="-90 0 0" color="#8B5A2B" src="#wood-floor" repeat="4 4"
+      <a-plane id="floor" width="12" height="12" rotation="-90 0 0" color="#8B5A2B" src="#wood-floor" repeat="4 4"
         shadow="receive: true" class="floor">
       </a-plane>
 
       <!-- Ceiling -->
-      <a-plane id="ceiling" width="10" height="10" position="0 3 0" rotation="90 0 0" color="#F5F5F5"
+      <a-plane id="ceiling" width="12" height="12" position="0 3 0" rotation="90 0 0" color="#F5F5F5"
         src="#ceiling-texture">
       </a-plane>
 
       <!-- Wall North -->
-      <a-plane width="10" height="3" position="0 1.5 -5" color="#EAEAEA" src="#white-wall"></a-plane>
+      <a-plane width="12" height="3" position="0 1.5 -6" color="#EAEAEA" src="#white-wall"></a-plane>
       <!-- Wall South -->
-      <a-plane width="10" height="3" position="0 1.5 5" rotation="0 180 0" color="#EAEAEA" src="#white-wall"></a-plane>
+      <a-plane width="12" height="3" position="0 1.5 6" rotation="0 180 0" color="#EAEAEA" src="#white-wall"></a-plane>
       <!-- Wall East -->
-      <a-plane width="10" height="3" position="5 1.5 0" rotation="0 -90 0" color="#EAEAEA" src="#white-wall"></a-plane>
+      <a-plane width="12" height="3" position="6 1.5 0" rotation="0 -90 0" color="#EAEAEA" src="#white-wall"></a-plane>
       <!-- Wall West -->
-      <a-plane width="10" height="3" position="-5 1.5 0" rotation="0 90 0" color="#EAEAEA" src="#white-wall"></a-plane>
+      <a-plane width="12" height="3" position="-6 1.5 0" rotation="0 90 0" color="#EAEAEA" src="#white-wall"></a-plane>
     </a-entity>
 
     <!-- Furniture Container (where saved/added furniture goes) -->

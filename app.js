@@ -1,88 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('furniture-container');
-    const categoryButtons = document.querySelectorAll('.category-btn');
+    const addButtons = document.querySelectorAll('.add-btn');
     const saveBtn = document.getElementById('btn-save');
-    const appLogicEl = document.getElementById('app-logic');
 
-    // UI elements for multi-model loading
-    const modelSelectionPanel = document.getElementById('model-selection-panel');
-    const categoryTitle = document.getElementById('category-title');
-    const modelList = document.getElementById('model-list');
-    const btnUploadModel = document.getElementById('btn-upload-model');
-    const modelUpload = document.getElementById('model-upload');
-
-    let currentCategory = null;
-
-    // We no longer rely on specific hardcoded HTML assets. 
-    // We store the data URL/Blob (or fallback if empty) for models here.
-    const customModels = {
-        'sofa': [{ name: 'Default Sofa', url: 'assets/models/sofa/sofa.glb' }],
-        'chair': [{ name: 'Default Chair', url: 'assets/models/chair/chair.glb' }],
-        'table': [{ name: 'Default Table', url: 'assets/models/table/table.glb' }],
-        'bed': [{ name: 'Default Bed', url: 'assets/models/bed/bed.glb' }],
-        'lamp': [{ name: 'Default Lamp', url: 'assets/models/lamp/lamp.glb' }],
-        'light': [{ name: 'Default Light', url: 'assets/models/light/light.glb' }],
-        'floor': [{ name: 'Default Floor', url: 'assets/models/floor/floor.glb' }],
-        'wardrobe': [{ name: 'Default Wardrobe', url: 'assets/models/wardrobe/wardrobe.glb' }]
-    };
-
-    // Fallbacks ensure the app works visually even if GLB models are missing
-    // Removed specific geometry per instructions to satisfy "Remove placeholder box".
-
-    // Category Selection Logic
-    categoryButtons.forEach(btn => {
+    // Add buttons listener
+    addButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            currentCategory = btn.getAttribute('data-type');
-            categoryTitle.textContent = btn.textContent;
-            modelSelectionPanel.style.display = 'flex';
-            renderModelList();
+            const type = btn.getAttribute('data-type');
+            addFurniture(type, { x: 0, y: 0, z: -2 }, { x: 0, y: 0, z: 0 });
         });
     });
-
-    // Handle File Uploads (for letting the user provide local .glb files dynamically)
-    btnUploadModel.addEventListener('click', () => {
-        modelUpload.click();
-    });
-
-    modelUpload.addEventListener('change', (e) => {
-        if (!currentCategory) return;
-
-        const files = e.target.files;
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const url = URL.createObjectURL(file);
-            customModels[currentCategory].push({
-                name: file.name,
-                url: url
-            });
-        }
-
-        renderModelList();
-        // Reset input
-        modelUpload.value = '';
-    });
-
-    // Render the list of models for the active category
-    function renderModelList() {
-        if (!currentCategory) return;
-
-        modelList.innerHTML = '';
-        const models = customModels[currentCategory];
-
-        if (models.length === 0) {
-            modelList.innerHTML = '<span style="font-size: 0.8rem; color: #aaa;">No models added yet.</span>';
-        }
-
-        models.forEach((model, index) => {
-            const btn = document.createElement('button');
-            btn.textContent = "Add " + model.name;
-            btn.style.fontSize = "0.85rem";
-            btn.addEventListener('click', () => {
-                addFurniture(currentCategory, model.url, { x: 0, y: 0, z: -2 }, { x: 0, y: 0, z: 0 });
-            });
-            modelList.appendChild(btn);
-        });
-    }
 
     // Save Button Listener
     saveBtn.addEventListener('click', () => {
@@ -91,28 +18,23 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { saveBtn.textContent = "Save Layout"; }, 2000);
     });
 
-    // Listen to layout-changed events from components
-    if (appLogicEl) {
-        appLogicEl.addEventListener('layout-changed', () => {
-            // saveLayout();
-        });
-    }
-
     /**
      * Add furniture to the scene
      */
-    function addFurniture(type, url, position, rotation) {
+    /**
+     * Add furniture to the scene
+     */
+    function addFurniture(type, position, rotation) {
         const el = document.createElement('a-entity');
 
         // Use custom attributes to identify the type later when saving
-        el.setAttribute('data-type', type);
-        el.setAttribute('data-url', url); // Keep track of the model url
+        el.setAttribute('data-model', type);
 
-        // Classes for raycaster
+        // Classes for interaction
         el.setAttribute('class', 'furniture clickable');
 
-        // GLTF Model reference: we inject the URL directly instead of a-assets references
-        el.setAttribute('gltf-model', `url(${url})`);
+        // Note: the requested format uses camelCase for the ID like: `#sofaModel`
+        el.setAttribute('gltf-model', `#${type}Model`);
 
         // Transform
         el.setAttribute('position', position);
@@ -123,6 +45,17 @@ document.addEventListener('DOMContentLoaded', () => {
         el.setAttribute('selectable', '');
         el.setAttribute('draggable', '');
         el.setAttribute('rotatable', '');
+
+        // Add a red placeholder box to display while loading
+        el.innerHTML = '<a-box color="red" class="placeholder-box" width="1" height="1" depth="1" position="0 0.5 0"></a-box>';
+
+        // Remove placeholder once the GLB model is fully loaded
+        el.addEventListener('model-loaded', () => {
+            const placeholder = el.querySelector('.placeholder-box');
+            if (placeholder) {
+                el.removeChild(placeholder);
+            }
+        });
 
         // Append to container
         container.appendChild(el);
@@ -136,19 +69,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const objects = container.querySelectorAll('.furniture');
 
         objects.forEach(obj => {
-            const type = obj.getAttribute('data-type');
-            const url = obj.getAttribute('data-url');
+            const modelType = obj.getAttribute('data-model');
 
-            // Note: Uploaded blob URLs won't persist across page reloads.
-            // A fully robust app would require an indexedDB/server to save binary blobs.
+            // Parse to numbers to format exactly like the JSON request
             const pos = obj.getAttribute('position');
             const rot = obj.getAttribute('rotation');
 
             items.push({
-                type: type,
-                url: url,
-                position: { x: pos.x, y: pos.y, z: pos.z },
-                rotation: { x: rot.x, y: rot.y, z: rot.z }
+                "model": modelType,
+                "position": { "x": pos.x, "y": pos.y, "z": pos.z },
+                "rotation": { "x": rot.x, "y": rot.y, "z": rot.z }
             });
         });
 
@@ -164,8 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const items = JSON.parse(saved);
                 items.forEach(item => {
-                    // Try to restore. Note that blob urls (blob:http://...) from previous sessions will be dead.
-                    addFurniture(item.type, item.url, item.position, item.rotation);
+                    addFurniture(item.model, item.position, item.rotation);
                 });
             } catch (e) {
                 console.error("Error loading layout", e);
