@@ -1,0 +1,19 @@
+# Ignore large asset folders
+assets/
+models/
+textures/
+environment/
+
+# Ignore large 3D / media files
+*.glb
+*.gltf
+*.hdr
+*.png
+*.jpg
+*.jpeg
+*.mp4
+*.zip
+
+# OS junk
+.DS_Store
+Thumbs.db
