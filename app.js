@@ -27,16 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Fallbacks ensure the app works visually even if GLB models are missing
-    const fallbacks = {
-        'sofa': '<a-box color="#FF6347" width="2" height="0.8" depth="1" position="0 0.4 0" shadow="cast: true; receive: true"></a-box>',
-        'chair': '<a-box color="#4682B4" width="0.8" height="1" depth="0.8" position="0 0.5 0" shadow="cast: true; receive: true"></a-box>',
-        'table': '<a-cylinder color="#A0522D" radius="1.2" height="0.8" position="0 0.4 0" shadow="cast: true; receive: true"></a-cylinder>',
-        'bed': '<a-box color="#8A2BE2" width="1.5" height="0.6" depth="2" position="0 0.3 0" shadow="cast: true; receive: true"></a-box>',
-        'lamp': '<a-cylinder color="#FFD700" radius="0.2" height="1.8" position="0 0.9 0" shadow="cast: true; receive: true"></a-cylinder>',
-        'light': '<a-sphere color="#FFF" radius="0.1" shader="flat" light="type: point; intensity: 1; distance: 10"></a-sphere>',
-        'floor': '<a-plane width="4" height="4" rotation="-90 0 0" color="#333" material="src: #wood-floor; repeat: 2 2" shadow="receive: true" class="floor"></a-plane>',
-        'wardrobe': '<a-box color="#8B4513" width="1.2" height="2" depth="0.6" position="0 1 0" shadow="cast: true; receive: true"></a-box>'
-    };
+    // Removed specific geometry per instructions to satisfy "Remove placeholder box".
 
     // Category Selection Logic
     categoryButtons.forEach(btn => {
@@ -111,8 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
      * Add furniture to the scene
      */
     function addFurniture(type, url, position, rotation) {
-        const fallbackHTML = fallbacks[type];
-
         const el = document.createElement('a-entity');
 
         // Use custom attributes to identify the type later when saving
@@ -120,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         el.setAttribute('data-url', url); // Keep track of the model url
 
         // Classes for raycaster
-        el.setAttribute('class', 'clickable furniture');
+        el.setAttribute('class', 'furniture clickable');
 
         // GLTF Model reference: we inject the URL directly instead of a-assets references
         el.setAttribute('gltf-model', `url(${url})`);
@@ -131,11 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
         el.setAttribute('scale', '1 1 1');
 
         // Interactive components
-        el.setAttribute('drag-drop', '');
-        el.setAttribute('rotate-object', '');
-
-        // Fallback geometry incase the GLB model isn't available
-        el.innerHTML = fallbackHTML;
+        el.setAttribute('selectable', '');
+        el.setAttribute('draggable', '');
+        el.setAttribute('rotatable', '');
 
         // Append to container
         container.appendChild(el);

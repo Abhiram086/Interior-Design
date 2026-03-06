@@ -9,8 +9,6 @@
   <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
 
   <!-- Custom Components -->
-  <script src="components/drag-drop.js"></script>
-  <script src="components/rotate-object.js"></script>
   <script src="components/object-menu.js"></script>
 
   <!-- App Logic -->
@@ -85,13 +83,12 @@
 
     <!-- Environment Setup -->
     <!-- Fallback colored sky if image is missing -->
-    <a-sky color="#87CEEB" src="#sky-env"></a-sky>
+    <a-sky color="#87CEEB"></a-sky>
 
     <!-- Lighting -->
-    <!-- Ambient lighting to softly illuminate everything -->
-    <a-entity light="type: ambient; color: #FFF; intensity: 0.6"></a-entity>
-    <!-- Directional light to simulate sun light and cast shadows -->
-    <a-entity light="type: directional; color: #FFF; intensity: 0.8; castShadow: true;" position="-1 2 1"></a-entity>
+    <a-light type="ambient" intensity="0.6"></a-light>
+    <a-light type="directional" position="2 4 2"></a-light>
+    <a-light type="point" intensity="0.5" position="0 3 0"></a-light>
 
     <!-- Room Setup (10m x 10m) -->
     <a-entity id="room">
@@ -130,9 +127,6 @@
       <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 10"
         line="color: red; opacity: 0.5"></a-entity>
     </a-entity>
-
-    <!-- A-frame Component to Handle UI State -->
-    <a-entity id="app-logic" object-menu></a-entity>
 
   </a-scene>
 
