@@ -11,7 +11,7 @@ AFRAME.registerComponent('drag-drop', {
         this.el.addEventListener('mousedown', this.onMouseDown);
         // Add to scene too in case we release mouse off the object
         this.el.sceneEl.addEventListener('mouseup', this.onMouseUp);
-        
+
         // Let the object be clickable by the raycaster
         this.el.classList.add('clickable');
     },
@@ -19,13 +19,13 @@ AFRAME.registerComponent('drag-drop', {
     onMouseDown: function (evt) {
         // Only start dragging if it was the primary intersection
         this.dragging = true;
-        
+
         // Temporarily disable the raycaster hitting this object while dragging so we can hit the floor instead
         this.el.classList.remove('clickable');
-        
+
         // Notify the app that this object was selected (for UI panel)
         this.el.sceneEl.emit('object-selected', { el: this.el });
-        
+
         // Prevent default event bubbling
         evt.stopPropagation();
     },
@@ -42,10 +42,21 @@ AFRAME.registerComponent('drag-drop', {
         if (!this.dragging) return;
 
         const sceneEl = this.el.sceneEl;
-        
+
         // Find existing raycasters (mouse cursor or VR laser controllers)
-        const raycasters = sceneEl.querySelectorAll('[raycaster]');
-        
+        const raycasters = [];
+
+        // The mouse raycaster is attached to the scene itself
+        if (sceneEl.components.raycaster) {
+            raycasters.push(sceneEl);
+        }
+
+        // VR controllers are entities within the scene
+        const els = sceneEl.querySelectorAll('[raycaster]');
+        for (let i = 0; i < els.length; i++) {
+            raycasters.push(els[i]);
+        }
+
         for (let i = 0; i < raycasters.length; i++) {
             const raycaster = raycasters[i].components.raycaster;
             if (raycaster && raycaster.intersections && raycaster.intersections.length > 0) {
@@ -64,16 +75,16 @@ AFRAME.registerComponent('drag-drop', {
                         y: pos.y,
                         z: point.z
                     });
-                    
+
                     // Fire an event to notify about layout change
                     this.el.sceneEl.emit('layout-changed');
-                    
+
                     break; // Only use the first valid raycaster intersection
                 }
             }
         }
     },
-    
+
     remove: function () {
         this.el.removeEventListener('mousedown', this.onMouseDown);
         this.el.sceneEl.removeEventListener('mouseup', this.onMouseUp);
