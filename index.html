@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR/VR Interior Design</title>
+    <!-- A-Frame 1.7.0 -->
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+
+    <!-- Custom Components -->
+    <script src="components/drag-drop.js"></script>
+    <script src="components/rotate-object.js"></script>
+    <script src="components/object-menu.js"></script>
+
+    <!-- App Logic -->
+    <script src="app.js" defer></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- UI Overlay container that floats above the A-Frame canvas -->
+    <div id="ui-container">
+        <div class="panel">
+            <h2>Interior Design</h2>
+
+            <div class="button-group">
+                <h3>Add Furniture</h3>
+                <button class="add-btn" data-type="sofa">Add Sofa</button>
+                <button class="add-btn" data-type="chair">Add Chair</button>
+                <button class="add-btn" data-type="table">Add Table</button>
+                <button class="add-btn" data-type="bed">Add Bed</button>
+                <button class="add-btn" data-type="lamp">Add Lamp</button>
+                <button class="add-btn" data-type="wardrobe">Add Wardrobe</button>
+            </div>
+
+            <div class="button-group align-bottom">
+                <h3>Selected Object</h3>
+                <button id="btn-rotate">Rotate</button>
+                <button id="btn-delete" class="danger">Delete</button>
+            </div>
+
+            <button id="btn-save">Save Layout</button>
+        </div>
+    </div>
+
+    <!-- A-Frame Scene -->
+    <a-scene raycaster="objects: .clickable" cursor="rayOrigin: mouse"
+        renderer="antialias: true; colorManagement: true;" light="defaultLightsEnabled: false">
+
+        <!-- Asset Management System -->
+        <a-assets timeout="10000">
+            <!-- Models (Lazy loading simulation: paths are specified but will fail silently if missing) -->
+            <a-asset-item id="sofa-model" src="assets/models/sofa.glb"></a-asset-item>
+            <a-asset-item id="bed-model" src="assets/models/bed.glb"></a-asset-item>
+            <a-asset-item id="chair-model" src="assets/models/chair.glb"></a-asset-item>
+            <a-asset-item id="table-model" src="assets/models/dining_table.glb"></a-asset-item>
+            <a-asset-item id="lamp-model" src="assets/models/lamp.glb"></a-asset-item>
+            <a-asset-item id="wardrobe-model" src="assets/models/wardrobe.glb"></a-asset-item>
+
+            <!-- Textures -->
+            <img id="wood-floor" src="assets/textures/wood_floor.jpg">
+            <img id="marble-floor" src="assets/textures/marble_floor.jpg">
+            <img id="white-wall" src="assets/textures/white_wall.jpg">
+            <img id="ceiling-texture" src="assets/textures/ceiling.jpg">
+
+            <!-- Environment -->
+            <img id="sky-env" src="assets/environment/apartment_hdr.jpg">
+        </a-assets>
+
+        <!-- Environment Setup -->
+        <!-- Fallback colored sky if image is missing -->
+        <a-sky color="#87CEEB" src="#sky-env"></a-sky>
+
+        <!-- Lighting -->
+        <!-- Ambient lighting to softly illuminate everything -->
+        <a-entity light="type: ambient; color: #FFF; intensity: 0.6"></a-entity>
+        <!-- Directional light to simulate sun light and cast shadows -->
+        <a-entity light="type: directional; color: #FFF; intensity: 0.8; castShadow: true;"
+            position="-1 2 1"></a-entity>
+
+        <!-- Room Setup (10m x 10m) -->
+        <a-entity id="room">
+            <!-- Floor -->
+            <a-plane id="floor" width="10" height="10" rotation="-90 0 0" color="#8B5A2B" src="#wood-floor" repeat="4 4"
+                shadow="receive: true" class="floor">
+            </a-plane>
+
+            <!-- Ceiling -->
+            <a-plane id="ceiling" width="10" height="10" position="0 3 0" rotation="90 0 0" color="#F5F5F5"
+                src="#ceiling-texture">
+            </a-plane>
+
+            <!-- Wall North -->
+            <a-plane width="10" height="3" position="0 1.5 -5" color="#EAEAEA" src="#white-wall"></a-plane>
+            <!-- Wall South -->
+            <a-plane width="10" height="3" position="0 1.5 5" rotation="0 180 0" color="#EAEAEA"
+                src="#white-wall"></a-plane>
+            <!-- Wall East -->
+            <a-plane width="10" height="3" position="5 1.5 0" rotation="0 -90 0" color="#EAEAEA"
+                src="#white-wall"></a-plane>
+            <!-- Wall West -->
+            <a-plane width="10" height="3" position="-5 1.5 0" rotation="0 90 0" color="#EAEAEA"
+                src="#white-wall"></a-plane>
+        </a-entity>
+
+        <!-- Furniture Container (where saved/added furniture goes) -->
+        <a-entity id="furniture-container"></a-entity>
+
+        <!-- Camera Rig for Desktop (WASD) and VR (Controllers) -->
+        <a-entity id="rig" position="0 0 4">
+            <!-- Camera -->
+            <a-camera position="0 1.6 0" look-controls="pointerLockEnabled: false"
+                wasd-controls="acceleration: 20"></a-camera>
+
+            <!-- VR Controllers (Left & Right) with laser interaction -->
+            <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 10"
+                line="color: red; opacity: 0.5"></a-entity>
+            <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 10"
+                line="color: red; opacity: 0.5"></a-entity>
+        </a-entity>
+
+        <!-- A-frame Component to Handle UI State -->
+        <a-entity id="app-logic" object-menu></a-entity>
+
+    </a-scene>
+
+</body>
+
+</html>

@@ -1,0 +1,115 @@
+/* Basic Reset and UI Layering */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Ensure A-Frame scene is behind UI */
+.a-canvas {
+    z-index: 1 !important;
+}
+
+/* UI Container over the WebGL Canvas */
+#ui-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Let clicks pass through to canvas by default */
+    z-index: 10;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* The Menu Panel */
+.panel {
+    background: rgba(30, 30, 30, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 20px;
+    color: white;
+    width: 250px;
+    pointer-events: auto; /* Catch clicks on the panel */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.panel h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    padding-bottom: 10px;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.button-group h3 {
+    margin: 5px 0 0 0;
+    font-size: 1rem;
+    color: #ccc;
+}
+
+/* Buttons Styling */
+button {
+    background: #0078D4;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    font-weight: 500;
+}
+
+button:hover {
+    background: #005A9E;
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button.danger {
+    background: #D13438;
+}
+
+button.danger:hover {
+    background: #A80000;
+}
+
+button:disabled {
+    background: #555;
+    color: #888;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Scrollbar specific for the panel */
+.panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.panel::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3); 
+    border-radius: 3px;
+}
